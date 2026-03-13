@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-image: url("https://img.freepik.com/premium-vector/simply-background_591079-12.jpg?w=1800");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background-color: beige;
+            border-radius: 30px;
+            padding: 40px;
+            width: 400px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        h2 {
+            color: #34623F;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            margin-bottom: 15px;
+            color: black;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #A1E5AB;
+            color: black;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: aquamarine;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .signup-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .signup-text a {
+            color: crimson;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .forgot-password {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: crimson;
+            text-decoration: none;
+        }
+        .google-login {
+            margin-top: 15px;
+        }
+    </style>
+    <script>
+        async function validateForm(event) {
+            event.preventDefault();
+            
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            let errorDiv = document.getElementById("error-message");
+    
+            if (email.trim() === "" || password.trim() === "") {
+                errorDiv.textContent = "Email and password are required!";
+                return;
+            }  
+            
+            let loginData = {
+                email: email,
+                password: password
+            };
+    
+            try {
+                let response = await fetch("http://localhost:8080/api/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(loginData)
+                });
+    
+                let result = await response.json();
+    
+                if (response.ok) {
+                    // Redirect to resume builder page after successful login
+                    window.location.href = "resume-builder.html"; // Update with the correct path if needed
+                } else {
+                    errorDiv.textContent = result.message || "Invalid credentials!";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                errorDiv.textContent = "Something went wrong. Please try again.";
+            }
+        }
+    
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID Token: " + response.credential);
+            // Send the token to your backend for verification
+        }
+    
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: "YOUR_GOOGLE_CLIENT_ID", // Replace with your Client ID
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("google-button"),
+                { theme: "outline", size: "large" }  // Customize button style
+            );
+        };
+    </script>
+</head>
+<body>
+    <div class="card">  
+        <h2>Login</h2>
+        <form id="login-form" onsubmit="validateForm(event)">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <div id="error-message" class="error"></div>
+            <button type="submit">Login</button>
+            <p class="signup-text">Don't have an account?<a href="signup.html">Sign up</a></p>
+            <a href="#" class="forgot-password">Forgotten Password</a>
+        </form>
+        
+        <!-- Google Login Button -->
+        <div id="google-button" class="google-login"></div>
+    </div>
+    <script src="script.js"></script>
+
+</body>
+</html>

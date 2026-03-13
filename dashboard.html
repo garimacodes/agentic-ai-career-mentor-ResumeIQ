@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireMeNow - Resume Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&family=Satisfy&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f8f5dc;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #a8e6a2;
+            padding: 20px 40px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 65px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #2d6a4f, #44b78b);
+            
+            -webkit-text-fill-color: transparent;
+            font-family: 'Satisfy', cursive;
+        }
+
+        .auth-btn {
+            font-size: 22px;
+            color: #2d6a4f;
+            cursor: pointer;
+            margin: 0 15px;
+            padding: 10px 20px;
+            border: 2px solid #2d6a4f;
+            border-radius: 8px;
+            background: none;
+            transition: all 0.3s ease-in-out;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .auth-btn:hover {
+            background: #2d6a4f;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .tagline {
+            font-size: 38px;
+            font-style: italic;
+            margin-top: 50px;
+            color: #2d6a4f;
+            font-weight: bold;
+        }
+
+        .welcome {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .description {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 20px auto;
+            line-height: 1.6;
+        }
+
+        .create-btn {
+            font-size: 30px;
+            font-weight: bold;
+            padding: 18px 40px;
+            background: linear-gradient(45deg, #2d6a4f, #44b78b);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .create-btn:hover {
+            background: linear-gradient(45deg, #1b4d3e, #2d6a4f);
+            transform: scale(1.05);
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("login").addEventListener("click", function() {
+                window.location.href = "login.html";
+            });
+
+            document.getElementById("signup").addEventListener("click", function() {
+                window.location.href = "signup.html";
+            });
+
+            document.getElementById("create").addEventListener("click", function() {
+                window.location.href = "details.html"; // Redirect to details.html
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1 class="logo">HireMeNow</h1>
+        <nav>
+            <button class="auth-btn" id="login">Login</button>
+            <button class="auth-btn" id="signup">Sign Up</button>
+        </nav>
+    </header>
+    <main>
+        <h2 class="tagline">“More than Resume it’s your story”</h2>
+        <h3 class="welcome">Welcome to HireMeNow! Your Career Journey Starts Here!</h3>
+        <p class="description">Creating a standout resume has never been easier. With our intuitive tools, expert tips, and customizable templates, we’re here to help you shine. Whether you’re just starting or looking for your next big opportunity, let’s craft a resume that tells your story and opens doors to success.</p>
+        <button class="create-btn" id="create">Create Now</button>
+    </main>
+    <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Resume Builder</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background: #a8e6a2;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container {
+            background: #f8f5dc;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            margin-top: 30px;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #198754, #25a972);
+            border: none;
+            font-weight: bold;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            border: none;
+        }
+
+        .resume-template {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        /* Template Styles */
+        .template-classic {
+            background: #ffffff;
+            border: 2px solid #000;
+            padding: 20px;
+        }
+
+        .template-modern {
+            background: #e3f2fd;
+            color: #0d47a1;
+            border-left: 5px solid #0d47a1;
+        }
+
+        .template-elegant {
+            background: #f5f5f5;
+            font-style: italic;
+            border: 2px dashed #000;
+        }
+
+        .header {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Font Change for Headings */
+        h2, h3, h4 {
+            font-family: 'Times New Roman', Times, serif;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: square;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="text-center">Build Your Resume</h2>
+
+    <div class="mb-3">
+        <label class="form-label">Select Resume Template:</label>
+        <select class="form-select" id="templateSelector" onchange="switchTemplate()">
+            <option value="template1">Classic</option>
+            <option value="template2">Modern</option>
+            <option value="template3">Elegant</option>
+        </select>
+    </div>
+
+    <form id="resumeForm">
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="fullName" onkeyup="updatePreview()">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" onkeyup="updatePreview()">
+        </div>
+
+        <h4>Work Experience</h4>
+        <div id="workExperience">
+            <div class="work-entry mb-3">
+                <input type="text" class="form-control mb-2" placeholder="Job Title" onkeyup="updatePreview()">
+                <input type="text" class="form-control mb-2" placeholder="Company Name" onkeyup="updatePreview()">
+                <textarea class="form-control mb-2" placeholder="Job Description" oninput="updatePreview()"></textarea>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeEntry(this)">Remove</button>
+            </div>
+        </div>
+        <button type="button" class="btn btn-success mb-3" onclick="addWorkExperience()">+ Add Experience</button>
+
+        <h4>Skills</h4>
+        <div id="skills">
+            <div class="skill-entry d-flex">
+                <input type="text" class="form-control mb-2 me-2" placeholder="Skill" onkeyup="updatePreview()">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeEntry(this)">Remove</button>
+            </div>
+        </div>
+        <button type="button" class="btn btn-success mb-3" onclick="addSkill()">+ Add Skill</button>
+    </form>
+    <button class="btn btn-primary d-block mt-3" onclick="downloadPDF()">Download as PDF</button>
+
+    <div id="resumeTemplates">
+        <div id="template1" class="resume-template template-classic">
+            <div class="header">
+                <h2 id="t1Name"></h2>
+                <p id="t1Email"></p>
+            </div>
+            <h3>Work Experience</h3>
+            <ul id="t1Experience"></ul>
+            <h3>Skills</h3>
+            <ul id="t1Skills"></ul>
+        </div>
+
+        <div id="template2" class="resume-template template-modern">
+            <div class="header">
+                <h1 id="t2Name"></h1>
+                <p id="t2Email"></p>
+            </div>
+            <h2>Experience</h2>
+            <ul id="t2Experience"></ul>
+            <h2>Skills</h2>
+            <ul id="t2Skills"></ul>
+        </div>
+
+        <div id="template3" class="resume-template template-elegant">
+            <div class="header">
+                <h2 id="t3Name"></h2>
+                <p id="t3Email"></p>
+            </div>
+            <h3>Experience</h3>
+            <ul id="t3Experience"></ul>
+            <h3>Skills</h3>
+            <ul id="t3Skills"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addWorkExperience() {
+        $("#workExperience").append(`
+            <div class="work-entry mb-3">
+                <input type="text" class="form-control mb-2" placeholder="Job Title" onkeyup="updatePreview()">
+                <input type="text" class="form-control mb-2" placeholder="Company Name" onkeyup="updatePreview()">
+                <textarea class="form-control mb-2" placeholder="Job Description" oninput="updatePreview()"></textarea>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeEntry(this)">Remove</button>
+            </div>
+        `);
+        updatePreview();
+    }
+
+    function addSkill() {
+        $("#skills").append(`
+            <div class="skill-entry d-flex">
+                <input type="text" class="form-control mb-2 me-2" placeholder="Skill" onkeyup="updatePreview()">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeEntry(this)">Remove</button>
+            </div>
+        `);
+        updatePreview();
+    }
+
+    function removeEntry(element) {
+        $(element).parent().remove();
+        updatePreview();
+    }
+
+    function updatePreview() {
+        $("#t1Name, #t2Name, #t3Name").text($("#fullName").val());
+        $("#t1Email, #t2Email, #t3Email").text($("#email").val());
+
+        let experienceList = "";
+        $(".work-entry").each(function () {
+            let job = $(this).find("input").eq(0).val();
+            let company = $(this).find("input").eq(1).val();
+            let desc = $(this).find("textarea").val();
+            experienceList += `<li>${job} at ${company} - ${desc}</li>`;
+        });
+        $("#t1Experience, #t2Experience, #t3Experience").html(experienceList);
+
+        let skills = "";
+        $(".skill-entry input").each(function () {
+            skills += `<li>${$(this).val()}</li>`;
+        });
+        $("#t1Skills, #t2Skills, #t3Skills").html(skills);
+    }
+
+    function switchTemplate() {
+        $(".resume-template").hide();
+        $("#" + $("#templateSelector").val()).show();
+    }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+            function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Get the currently selected template
+        let selectedTemplateId = document.getElementById("templateSelector").value;
+        let selectedTemplate = document.getElementById(selectedTemplateId);
+
+        if (!selectedTemplate || selectedTemplate.style.display === "none") {
+            alert("Please select a resume template before downloading.");
+            return;
+        }
+
+        let resumeContent = selectedTemplate.innerText || selectedTemplate.textContent;
+
+    
+        let marginLeft = 10;
+        let marginTop = 10;
+        let maxWidth = 180; 
+        let lineHeight = 8; // Spacing between lines
+
+        let lines = doc.splitTextToSize(resumeContent, maxWidth);
+
+     
+        doc.text(lines, marginLeft, marginTop + lineHeight);
+
+     
+        doc.save("resume.pdf");
+    }
+    </script>
+
+</script>
+<script src="script.js"></script>
+
+</body>
+</html>
+
