@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Career Analysis — CareerAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🔍 Career <span class="gradient-text">Analysis</span></h1>
+    <p>Upload your resume or use the one you built, and let our AI agents analyze your career profile</p>
+</div>
+
+<div class="analyze-container">
+    <div class="glass-card">
+        <form method="POST" action="/analyze" enctype="multipart/form-data" onsubmit="showLoading()">
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" class="form-input" name="name" placeholder="e.g. John Doe" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Degree / Qualification</label>
+                    <input type="text" class="form-input" name="degree" placeholder="e.g. B.Tech CS" required>
+                </div>
+                <div class="form-group">
+                    <label>Career Goal</label>
+                    <input type="text" class="form-input" name="goal" placeholder="e.g. ML Engineer" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Key Skills (comma separated)</label>
+                <input type="text" class="form-input" name="skills" placeholder="e.g. Python, TensorFlow, SQL, Flask" required>
+            </div>
+
+            <div style="margin: 24px 0;">
+                {% if built_resume %}
+                <div class="resume-source-info">
+                    ✅ Using resume from Resume Builder
+                </div>
+                <input type="hidden" name="resume_text" value="{{ built_resume }}">
+                <div class="or-divider">or upload a different one</div>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📎</div>
+                    <p>Click or drag to upload a PDF resume</p>
+                    <div class="file-name" id="fileName"></div>
+                    <input type="file" name="resume" accept=".pdf" onchange="handleFile(this)">
+                </div>
+                {% else %}
+                <label style="font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;display:block;">Upload Resume (PDF)</label>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📎</div>
+                    <p>Click or drag to upload your PDF resume</p>
+                    <div class="file-name" id="fileName"></div>
+                    <input type="file" name="resume" accept=".pdf" required onchange="handleFile(this)">
+                </div>
+                <div class="or-divider">or</div>
+                <div style="text-align:center;">
+                    <a href="/builder" class="btn btn-secondary btn-sm">📝 Build a resume first</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">
+                🚀 Run AI Analysis
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function handleFile(input) {
+    const name = input.files[0]?.name;
+    if (name) {
+        document.getElementById('fileName').textContent = '📄 ' + name;
+    }
+}
+
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.add('active');
+}
+</script>
+{% endblock %}

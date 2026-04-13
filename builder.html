@@ -1,0 +1,583 @@
+{% extends "base.html" %}
+{% block title %}Resume Builder — CareerAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📝 Resume <span class="gradient-text">Builder</span></h1>
+    <p>Build your resume section by section with a live preview</p>
+</div>
+
+<div class="builder-layout">
+    <!-- Left: Form Panel -->
+    <div class="builder-form-panel">
+        <div class="glass-card">
+            <!-- Step Navigation -->
+            <div class="builder-steps">
+                <button class="step-btn active" onclick="showStep(0)">👤 Personal</button>
+                <button class="step-btn" onclick="showStep(1)">🎓 Education</button>
+                <button class="step-btn" onclick="showStep(2)">💼 Experience</button>
+                <button class="step-btn" onclick="showStep(3)">⚡ Skills</button>
+                <button class="step-btn" onclick="showStep(4)">🚀 Projects</button>
+                <button class="step-btn" onclick="showStep(5)">📜 Certifications</button>
+            </div>
+
+            <!-- Step 0: Personal Info -->
+            <div class="builder-section active" data-step="0">
+                <div class="section-title">
+                    <span class="section-number">1</span> Personal Information
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-input" id="fullName" placeholder="e.g. John Doe" oninput="updatePreview()">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-input" id="email" placeholder="john@example.com" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" class="form-input" id="phone" placeholder="+91 98765 43210" oninput="updatePreview()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>LinkedIn URL</label>
+                        <input type="url" class="form-input" id="linkedin" placeholder="linkedin.com/in/johndoe" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>Portfolio / GitHub</label>
+                        <input type="url" class="form-input" id="portfolio" placeholder="github.com/johndoe" oninput="updatePreview()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Professional Summary</label>
+                    <textarea class="form-textarea" id="summary" rows="3" placeholder="Brief summary of your professional profile..." oninput="updatePreview()"></textarea>
+                </div>
+                <div class="builder-actions">
+                    <button class="btn btn-primary btn-sm" onclick="showStep(1)">Next: Education →</button>
+                </div>
+            </div>
+
+            <!-- Step 1: Education -->
+            <div class="builder-section" data-step="1">
+                <div class="section-title">
+                    <span class="section-number">2</span> Education
+                </div>
+                <div class="dynamic-items" id="educationItems">
+                    <div class="dynamic-item">
+                        <button class="remove-item" onclick="removeItem(this)" title="Remove">✕</button>
+                        <div class="form-group">
+                            <label>Degree</label>
+                            <input type="text" class="form-input edu-degree" placeholder="e.g. B.Tech Computer Science" oninput="updatePreview()">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Institution</label>
+                                <input type="text" class="form-input edu-institution" placeholder="e.g. IIT Delhi" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Year</label>
+                                <input type="text" class="form-input edu-year" placeholder="e.g. 2022 - 2026" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>GPA / Percentage</label>
+                            <input type="text" class="form-input edu-gpa" placeholder="e.g. 8.5 / 10" oninput="updatePreview()">
+                        </div>
+                    </div>
+                </div>
+                <button class="add-item-btn" onclick="addEducation()">+ Add Education</button>
+                <div class="builder-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="showStep(0)">← Previous</button>
+                    <button class="btn btn-primary btn-sm" onclick="showStep(2)">Next: Experience →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Experience -->
+            <div class="builder-section" data-step="2">
+                <div class="section-title">
+                    <span class="section-number">3</span> Work Experience
+                </div>
+                <div class="dynamic-items" id="experienceItems">
+                    <div class="dynamic-item">
+                        <button class="remove-item" onclick="removeItem(this)" title="Remove">✕</button>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Job Title</label>
+                                <input type="text" class="form-input exp-title" placeholder="e.g. Software Intern" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Company</label>
+                                <input type="text" class="form-input exp-company" placeholder="e.g. Google" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration</label>
+                            <input type="text" class="form-input exp-duration" placeholder="e.g. June 2025 - Aug 2025" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Description (one bullet point per line)</label>
+                            <textarea class="form-textarea exp-desc" rows="3" placeholder="Developed REST APIs serving 10k+ requests/day&#10;Reduced latency by 30% through caching" oninput="updatePreview()"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-item-btn" onclick="addExperience()">+ Add Experience</button>
+                <div class="builder-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="showStep(1)">← Previous</button>
+                    <button class="btn btn-primary btn-sm" onclick="showStep(3)">Next: Skills →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Skills -->
+            <div class="builder-section" data-step="3">
+                <div class="section-title">
+                    <span class="section-number">4</span> Skills
+                </div>
+                <div class="form-group">
+                    <label>Type a skill and press Enter or click Add</label>
+                    <div class="skills-input-wrapper">
+                        <input type="text" class="form-input" id="skillInput" placeholder="e.g. Python" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill();}">
+                        <button class="btn btn-primary btn-sm" onclick="addSkill()" style="white-space:nowrap;">+ Add</button>
+                    </div>
+                    <div class="skills-tags" id="skillsTags"></div>
+                </div>
+                <div class="builder-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="showStep(2)">← Previous</button>
+                    <button class="btn btn-primary btn-sm" onclick="showStep(4)">Next: Projects →</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Projects -->
+            <div class="builder-section" data-step="4">
+                <div class="section-title">
+                    <span class="section-number">5</span> Projects
+                </div>
+                <div class="dynamic-items" id="projectItems">
+                    <div class="dynamic-item">
+                        <button class="remove-item" onclick="removeItem(this)" title="Remove">✕</button>
+                        <div class="form-group">
+                            <label>Project Title</label>
+                            <input type="text" class="form-input proj-title" placeholder="e.g. AI Chatbot" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Tech Stack</label>
+                            <input type="text" class="form-input proj-tech" placeholder="e.g. Python, Flask, OpenAI" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Description (one bullet point per line)</label>
+                            <textarea class="form-textarea proj-desc" rows="3" placeholder="Built an AI chatbot with 95% accuracy&#10;Integrated with Slack for team communication" oninput="updatePreview()"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-item-btn" onclick="addProject()">+ Add Project</button>
+                <div class="builder-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="showStep(3)">← Previous</button>
+                    <button class="btn btn-primary btn-sm" onclick="showStep(5)">Next: Certifications →</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Certifications -->
+            <div class="builder-section" data-step="5">
+                <div class="section-title">
+                    <span class="section-number">6</span> Certifications
+                </div>
+                <div class="dynamic-items" id="certItems">
+                    <div class="dynamic-item">
+                        <button class="remove-item" onclick="removeItem(this)" title="Remove">✕</button>
+                        <div class="form-group">
+                            <label>Certification Name</label>
+                            <input type="text" class="form-input cert-name" placeholder="e.g. AWS Cloud Practitioner" oninput="updatePreview()">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Issuing Organization</label>
+                                <input type="text" class="form-input cert-issuer" placeholder="e.g. Amazon Web Services" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="text" class="form-input cert-date" placeholder="e.g. March 2025" oninput="updatePreview()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-item-btn" onclick="addCertification()">+ Add Certification</button>
+                <div class="builder-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="showStep(4)">← Previous</button>
+                    <button class="btn btn-success btn-sm" onclick="finalizeResume()">✓ Finalize Resume</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Preview Panel -->
+    <div>
+        <div class="preview-actions">
+            <button class="btn btn-secondary btn-sm" onclick="downloadPDF()">📥 Download PDF</button>
+            <form method="POST" action="/use-built-resume" style="margin:0;">
+                <input type="hidden" name="resume_text" id="resumeTextHidden">
+                <button type="submit" class="btn btn-success btn-sm" onclick="prepareResumeText()">🔍 Use for Analysis</button>
+            </form>
+        </div>
+        <div class="resume-preview" id="resumePreview">
+            <div class="preview-empty">
+                <p style="font-size:2rem;margin-bottom:12px;">📄</p>
+                <p>Start filling in your details to see<br>a live preview of your resume here</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- html2pdf CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── State ──
+let skills = [];
+let currentStep = 0;
+
+// ── Step Navigation ──
+function showStep(index) {
+    currentStep = index;
+    document.querySelectorAll('.builder-section').forEach(s => s.classList.remove('active'));
+    document.querySelector(`[data-step="${index}"]`).classList.add('active');
+
+    document.querySelectorAll('.step-btn').forEach((btn, i) => {
+        btn.classList.remove('active');
+        if (i === index) btn.classList.add('active');
+    });
+}
+
+// ── Skills ──
+function addSkill() {
+    const input = document.getElementById('skillInput');
+    const val = input.value.trim();
+    if (val && !skills.includes(val)) {
+        skills.push(val);
+        renderSkills();
+        updatePreview();
+    }
+    input.value = '';
+    input.focus();
+}
+
+function removeSkill(index) {
+    skills.splice(index, 1);
+    renderSkills();
+    updatePreview();
+}
+
+function renderSkills() {
+    const container = document.getElementById('skillsTags');
+    container.innerHTML = skills.map((s, i) =>
+        `<span class="skill-tag">${s} <span class="remove-skill" onclick="removeSkill(${i})">✕</span></span>`
+    ).join('');
+}
+
+// ── Dynamic Items ──
+function removeItem(btn) {
+    const item = btn.closest('.dynamic-item');
+    const container = item.parentElement;
+    if (container.children.length > 1) {
+        item.remove();
+        updatePreview();
+    }
+}
+
+function addEducation() {
+    const html = `<div class="dynamic-item">
+        <button class="remove-item" onclick="removeItem(this)" title="Remove">✕</button>
+        <div class="form-group"><label>Degree</label><input type="text" class="form-input edu-degree" placeholder="e.g. M.Sc Data Science" oninput="updatePreview()"></div>
+        <div class="form-row">
+            <div class="form-group"><label>Institution</label><input type="text" class="form-input edu-institution" placeholder="Institution" oninput="updatePreview()"></div>
+            <div class="form-group"><label>Year</label><input type="text" class="form-input edu-year" placeholder="Year" oninput="updatePreview()"></div>
+        </div>
+        <div class="form-group"><label>GPA / Percentage</label><input type="text" class="form-input edu-gpa" placeholder="GPA" oninput="updatePreview()"></div>
+    </div>`;
+    document.getElementById('educationItems').insertAdjacentHTML('beforeend', html);
+}
+
+function addExperience() {
+    const html = `<div class="dynamic-item">
+        <button class="remove-item" onclick="removeItem(this)" title="Remove">✕</button>
+        <div class="form-row">
+            <div class="form-group"><label>Job Title</label><input type="text" class="form-input exp-title" placeholder="Job Title" oninput="updatePreview()"></div>
+            <div class="form-group"><label>Company</label><input type="text" class="form-input exp-company" placeholder="Company" oninput="updatePreview()"></div>
+        </div>
+        <div class="form-group"><label>Duration</label><input type="text" class="form-input exp-duration" placeholder="Duration" oninput="updatePreview()"></div>
+        <div class="form-group"><label>Description (one bullet point per line)</label><textarea class="form-textarea exp-desc" rows="3" placeholder="Bullet points..." oninput="updatePreview()"></textarea></div>
+    </div>`;
+    document.getElementById('experienceItems').insertAdjacentHTML('beforeend', html);
+}
+
+function addProject() {
+    const html = `<div class="dynamic-item">
+        <button class="remove-item" onclick="removeItem(this)" title="Remove">✕</button>
+        <div class="form-group"><label>Project Title</label><input type="text" class="form-input proj-title" placeholder="Project Title" oninput="updatePreview()"></div>
+        <div class="form-group"><label>Tech Stack</label><input type="text" class="form-input proj-tech" placeholder="Tech Stack" oninput="updatePreview()"></div>
+        <div class="form-group"><label>Description (one bullet point per line)</label><textarea class="form-textarea proj-desc" rows="3" placeholder="Description..." oninput="updatePreview()"></textarea></div>
+    </div>`;
+    document.getElementById('projectItems').insertAdjacentHTML('beforeend', html);
+}
+
+function addCertification() {
+    const html = `<div class="dynamic-item">
+        <button class="remove-item" onclick="removeItem(this)" title="Remove">✕</button>
+        <div class="form-group"><label>Certification Name</label><input type="text" class="form-input cert-name" placeholder="Certification" oninput="updatePreview()"></div>
+        <div class="form-row">
+            <div class="form-group"><label>Issuing Organization</label><input type="text" class="form-input cert-issuer" placeholder="Issuer" oninput="updatePreview()"></div>
+            <div class="form-group"><label>Date</label><input type="text" class="form-input cert-date" placeholder="Date" oninput="updatePreview()"></div>
+        </div>
+    </div>`;
+    document.getElementById('certItems').insertAdjacentHTML('beforeend', html);
+}
+
+// ── Live Preview ──
+function updatePreview() {
+    const name = document.getElementById('fullName').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const linkedin = document.getElementById('linkedin').value;
+    const portfolio = document.getElementById('portfolio').value;
+    const summary = document.getElementById('summary').value;
+
+    // Check if anything is filled
+    if (!name && !email && skills.length === 0) {
+        document.getElementById('resumePreview').innerHTML = `
+            <div class="preview-empty">
+                <p style="font-size:2rem;margin-bottom:12px;">📄</p>
+                <p>Start filling in your details to see<br>a live preview of your resume here</p>
+            </div>`;
+        return;
+    }
+
+    let html = '';
+
+    // Header
+    html += `<h2>${name || 'Your Name'}</h2>`;
+    const contacts = [email, phone, linkedin, portfolio].filter(Boolean);
+    if (contacts.length) {
+        html += `<div class="preview-contact">${contacts.map(c => `<span>${c}</span>`).join('<span>•</span>')}</div>`;
+    }
+
+    // Summary
+    if (summary) {
+        html += `<div class="preview-section">
+            <div class="preview-section-title">Professional Summary</div>
+            <p>${summary}</p>
+        </div>`;
+    }
+
+    // Education
+    const eduItems = document.querySelectorAll('#educationItems .dynamic-item');
+    let eduHtml = '';
+    eduItems.forEach(item => {
+        const degree = item.querySelector('.edu-degree').value;
+        const institution = item.querySelector('.edu-institution').value;
+        const year = item.querySelector('.edu-year').value;
+        const gpa = item.querySelector('.edu-gpa').value;
+        if (degree || institution) {
+            eduHtml += `<div class="preview-item">
+                <div class="preview-item-header">
+                    <span class="preview-item-title">${degree}</span>
+                    <span class="preview-item-date">${year}</span>
+                </div>
+                <div class="preview-item-subtitle">${institution}${gpa ? ' — ' + gpa : ''}</div>
+            </div>`;
+        }
+    });
+    if (eduHtml) {
+        html += `<div class="preview-section"><div class="preview-section-title">Education</div>${eduHtml}</div>`;
+    }
+
+    // Experience
+    const expItems = document.querySelectorAll('#experienceItems .dynamic-item');
+    let expHtml = '';
+    expItems.forEach(item => {
+        const title = item.querySelector('.exp-title').value;
+        const company = item.querySelector('.exp-company').value;
+        const duration = item.querySelector('.exp-duration').value;
+        const desc = item.querySelector('.exp-desc').value;
+        if (title || company) {
+            let bullets = '';
+            if (desc) {
+                const lines = desc.split('\n').filter(l => l.trim());
+                bullets = `<ul class="preview-bullets">${lines.map(l => `<li>${l.trim()}</li>`).join('')}</ul>`;
+            }
+            expHtml += `<div class="preview-item">
+                <div class="preview-item-header">
+                    <span class="preview-item-title">${title}${company ? ' — ' + company : ''}</span>
+                    <span class="preview-item-date">${duration}</span>
+                </div>
+                ${bullets}
+            </div>`;
+        }
+    });
+    if (expHtml) {
+        html += `<div class="preview-section"><div class="preview-section-title">Experience</div>${expHtml}</div>`;
+    }
+
+    // Skills
+    if (skills.length) {
+        html += `<div class="preview-section">
+            <div class="preview-section-title">Skills</div>
+            <div class="preview-skills">${skills.map(s => `<span class="preview-skill-tag">${s}</span>`).join('')}</div>
+        </div>`;
+    }
+
+    // Projects
+    const projItems = document.querySelectorAll('#projectItems .dynamic-item');
+    let projHtml = '';
+    projItems.forEach(item => {
+        const title = item.querySelector('.proj-title').value;
+        const tech = item.querySelector('.proj-tech').value;
+        const desc = item.querySelector('.proj-desc').value;
+        if (title) {
+            let bullets = '';
+            if (desc) {
+                const lines = desc.split('\n').filter(l => l.trim());
+                bullets = `<ul class="preview-bullets">${lines.map(l => `<li>${l.trim()}</li>`).join('')}</ul>`;
+            }
+            projHtml += `<div class="preview-item">
+                <div class="preview-item-title">${title}</div>
+                ${tech ? `<div class="preview-item-subtitle">${tech}</div>` : ''}
+                ${bullets}
+            </div>`;
+        }
+    });
+    if (projHtml) {
+        html += `<div class="preview-section"><div class="preview-section-title">Projects</div>${projHtml}</div>`;
+    }
+
+    // Certifications
+    const certItemsEl = document.querySelectorAll('#certItems .dynamic-item');
+    let certHtml = '';
+    certItemsEl.forEach(item => {
+        const name = item.querySelector('.cert-name').value;
+        const issuer = item.querySelector('.cert-issuer').value;
+        const date = item.querySelector('.cert-date').value;
+        if (name) {
+            certHtml += `<div class="preview-item">
+                <div class="preview-item-header">
+                    <span class="preview-item-title">${name}</span>
+                    <span class="preview-item-date">${date}</span>
+                </div>
+                ${issuer ? `<div class="preview-item-subtitle">${issuer}</div>` : ''}
+            </div>`;
+        }
+    });
+    if (certHtml) {
+        html += `<div class="preview-section"><div class="preview-section-title">Certifications</div>${certHtml}</div>`;
+    }
+
+    document.getElementById('resumePreview').innerHTML = html;
+}
+
+// ── Generate Resume Text ──
+function getResumeText() {
+    const name = document.getElementById('fullName').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const linkedin = document.getElementById('linkedin').value;
+    const portfolio = document.getElementById('portfolio').value;
+    const summary = document.getElementById('summary').value;
+
+    let text = `${name}\n${[email, phone, linkedin, portfolio].filter(Boolean).join(' | ')}\n\n`;
+
+    if (summary) text += `PROFESSIONAL SUMMARY\n${summary}\n\n`;
+
+    // Education
+    const eduItems = document.querySelectorAll('#educationItems .dynamic-item');
+    let eduText = '';
+    eduItems.forEach(item => {
+        const degree = item.querySelector('.edu-degree').value;
+        const institution = item.querySelector('.edu-institution').value;
+        const year = item.querySelector('.edu-year').value;
+        const gpa = item.querySelector('.edu-gpa').value;
+        if (degree || institution) {
+            eduText += `${degree} - ${institution} (${year})${gpa ? ', GPA: ' + gpa : ''}\n`;
+        }
+    });
+    if (eduText) text += `EDUCATION\n${eduText}\n`;
+
+    // Experience
+    const expItems = document.querySelectorAll('#experienceItems .dynamic-item');
+    let expText = '';
+    expItems.forEach(item => {
+        const title = item.querySelector('.exp-title').value;
+        const company = item.querySelector('.exp-company').value;
+        const duration = item.querySelector('.exp-duration').value;
+        const desc = item.querySelector('.exp-desc').value;
+        if (title || company) {
+            expText += `${title} at ${company} (${duration})\n`;
+            if (desc) {
+                desc.split('\n').filter(l => l.trim()).forEach(l => { expText += `• ${l.trim()}\n`; });
+            }
+            expText += '\n';
+        }
+    });
+    if (expText) text += `EXPERIENCE\n${expText}`;
+
+    // Skills
+    if (skills.length) text += `SKILLS\n${skills.join(', ')}\n\n`;
+
+    // Projects
+    const projItems = document.querySelectorAll('#projectItems .dynamic-item');
+    let projText = '';
+    projItems.forEach(item => {
+        const title = item.querySelector('.proj-title').value;
+        const tech = item.querySelector('.proj-tech').value;
+        const desc = item.querySelector('.proj-desc').value;
+        if (title) {
+            projText += `${title} [${tech}]\n`;
+            if (desc) {
+                desc.split('\n').filter(l => l.trim()).forEach(l => { projText += `• ${l.trim()}\n`; });
+            }
+            projText += '\n';
+        }
+    });
+    if (projText) text += `PROJECTS\n${projText}`;
+
+    // Certifications
+    const certItemsEl = document.querySelectorAll('#certItems .dynamic-item');
+    let certText = '';
+    certItemsEl.forEach(item => {
+        const cname = item.querySelector('.cert-name').value;
+        const issuer = item.querySelector('.cert-issuer').value;
+        const date = item.querySelector('.cert-date').value;
+        if (cname) {
+            certText += `${cname} — ${issuer} (${date})\n`;
+        }
+    });
+    if (certText) text += `CERTIFICATIONS\n${certText}`;
+
+    return text;
+}
+
+function prepareResumeText() {
+    document.getElementById('resumeTextHidden').value = getResumeText();
+}
+
+// ── PDF Download ──
+function downloadPDF() {
+    const element = document.getElementById('resumePreview');
+    const name = document.getElementById('fullName').value || 'Resume';
+    html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: name.replace(/\s+/g, '_') + '_Resume.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(element).save();
+}
+
+// ── Finalize ──
+function finalizeResume() {
+    // Mark all steps as completed
+    document.querySelectorAll('.step-btn').forEach(btn => btn.classList.add('completed'));
+    alert('✅ Resume finalized! You can now download it as PDF or use it for AI analysis.');
+}
+</script>
+{% endblock %}

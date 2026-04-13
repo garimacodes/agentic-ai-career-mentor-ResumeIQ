@@ -1,0 +1,484 @@
+{% extends "base.html" %}
+{% block title %}Mock Interview — CareerAI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🎤 Mock <span class="gradient-text">Interview</span></h1>
+    <p>Practice interviews with AI feedback to boost your confidence</p>
+</div>
+
+<!-- Setup Screen -->
+<div class="interview-container" id="setupScreen">
+    <div class="glass-card interview-setup">
+        <div class="setup-header">
+            <div class="setup-icon">🎯</div>
+            <h2>Configure Your Interview</h2>
+            <p>Choose your target role and difficulty to get started</p>
+        </div>
+
+        <div class="form-group">
+            <label>Target Role / Position</label>
+            <input type="text" class="form-input" id="interviewRole" placeholder="e.g. Frontend Developer, Data Scientist, ML Engineer">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Difficulty Level</label>
+                <select class="form-input form-select" id="interviewDifficulty">
+                    <option value="easy">🟢 Easy — Entry Level</option>
+                    <option value="medium" selected>🟡 Medium — Mid Level</option>
+                    <option value="hard">🔴 Hard — Senior Level</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Number of Questions</label>
+                <select class="form-input form-select" id="interviewCount">
+                    <option value="3">3 Questions (Quick)</option>
+                    <option value="5" selected>5 Questions (Standard)</option>
+                    <option value="8">8 Questions (Thorough)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="interview-tips glass-card" style="margin-top:20px;">
+            <h3>💡 Tips for a Great Interview</h3>
+            <ul>
+                <li>Use the <strong>STAR method</strong> for behavioral questions (Situation, Task, Action, Result)</li>
+                <li>Be <strong>specific</strong> — use real examples from your experience</li>
+                <li>Keep answers <strong>concise</strong> — aim for 2-4 sentences per point</li>
+                <li>Don't rush — take time to <strong>think</strong> before answering</li>
+            </ul>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:24px;" onclick="startInterview()" id="startBtn">
+            🚀 Start Interview
+        </button>
+    </div>
+</div>
+
+<!-- Interview Screen -->
+<div class="interview-container" id="interviewScreen" style="display:none;">
+
+    <!-- Top Grid -->
+    <div class="interview-grid">
+
+        <!-- LEFT: Chat -->
+        <div class="interview-left">
+
+            <!-- Progress -->
+            <div class="interview-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText"></div>
+            </div>
+
+            <!-- Chat -->
+            <div class="chat-area" id="chatArea"></div>
+
+            <!-- Answer -->
+            <div class="answer-input-area" id="answerArea">
+                <div class="question-type-badge" id="questionTypeBadge"></div>
+
+                <textarea id="answerInput" class="form-textarea answer-textarea"
+                    placeholder="Type or speak your answer..."></textarea>
+
+                <div class="answer-actions">
+                    <div id="answerHint" class="answer-hint"></div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="startVoiceInput()" id="voiceBtn">
+                            🎤 Speak
+                        </button>
+
+                        <button class="btn btn-primary" onclick="submitAnswer()" id="submitAnswerBtn">
+                            Send →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Camera -->
+        <div class="interview-right">
+            <div class="camera-container">
+                <video id="cameraFeed" autoplay muted playsinline class="camera-feed"></video>
+                <div class="camera-status" id="cameraStatus">Camera Off</div>
+                <button class="btn btn-secondary camera-toggle" onclick="toggleCamera()">
+                    📷 Toggle Camera
+                </button>
+            </div>
+
+    </div>
+</div>
+
+
+<!-- Summary Screen -->
+<div class="interview-container" id="summaryScreen" style="display:none;">
+    <div class="glass-card interview-summary">
+        <div class="summary-header">
+            <div class="setup-icon">🏆</div>
+            <h2>Interview Complete!</h2>
+            <p>Here's your performance summary</p>
+        </div>
+        <div class="summary-content" id="summaryContent">
+            <!-- Summary will be loaded here -->
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="resetInterview()">🔄 Try Another Interview</button>
+            <a href="/builder" class="btn btn-secondary">📝 Improve Resume</a>
+            <a href="/analyze" class="btn btn-secondary">🔍 Career Analysis</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── State ──
+let questions = [];
+let currentQuestion = 0;
+let answers = [];
+let interviewRole = '';
+
+// ── Start Interview ──
+async function startInterview() {
+    const role = document.getElementById('interviewRole').value.trim();
+    if (!role) {
+        document.getElementById('interviewRole').focus();
+        document.getElementById('interviewRole').style.borderColor = 'var(--accent-rose)';
+        return;
+    }
+
+    interviewRole = role;
+    const difficulty = document.getElementById('interviewDifficulty').value;
+    const count = document.getElementById('interviewCount').value;
+
+    // Show loading
+    const btn = document.getElementById('startBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Generating questions...';
+
+    try {
+        const res = await fetch('/api/interview/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role, difficulty, num_questions: parseInt(count) })
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+            alert('Error: ' + data.error);
+            btn.disabled = false;
+            btn.innerHTML = '🚀 Start Interview';
+            return;
+        }
+
+        questions = data.questions;
+        currentQuestion = 0;
+        answers = [];
+
+        // Switch screens
+        document.getElementById('setupScreen').style.display = 'none';
+        document.getElementById('interviewScreen').style.display = 'block';
+
+        // Show first question
+        showQuestion();
+    } catch (err) {
+        alert('Failed to start interview. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = '🚀 Start Interview';
+    }
+}
+
+function showQuestion() {
+    const q = questions[currentQuestion];
+    const total = questions.length;
+
+    const pct = (currentQuestion / total) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `Question ${currentQuestion + 1} of ${total}`;
+
+    addChatMessage('interviewer', q.question, q.type);
+
+    // 🔥 AI SPEAKS
+    const speech = new SpeechSynthesisUtterance(q.question);
+    speech.lang = "en-IN";
+    window.speechSynthesis.speak(speech);
+
+    const badge = document.getElementById('questionTypeBadge');
+    badge.textContent = q.type + ' Question';
+    badge.className = 'question-type-badge type-' + q.type.toLowerCase();
+
+    document.getElementById('answerHint').innerHTML = '💡 ' + q.tips;
+    document.getElementById('answerInput').value = '';
+}
+
+
+// ── Submit Answer ──
+async function submitAnswer() {
+    const answer = document.getElementById('answerInput').value.trim();
+    if (!answer) {
+        document.getElementById('answerInput').focus();
+        return;
+    }
+
+    const q = questions[currentQuestion];
+
+    // Add user message
+    addChatMessage('user', answer);
+
+    // Disable input
+    const btn = document.getElementById('submitAnswerBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Evaluating...';
+    document.getElementById('answerArea').style.display = 'none';
+
+    // Add thinking indicator
+    const thinkingId = addThinking();
+
+    try {
+        const res = await fetch('/api/interview/answer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                question: q.question,
+                answer: answer,
+                role: interviewRole
+            })
+        });
+
+        const data = await res.json();
+
+        // Remove thinking indicator
+        removeThinking(thinkingId);
+
+        // Add feedback message
+        addChatMessage('feedback', data.feedback);
+
+        // Store answer
+        answers.push({ question: q.question, answer: answer });
+
+        // Move to next question or finish
+        currentQuestion++;
+
+        if (currentQuestion < questions.length) {
+            // Show "Next Question" button
+            addNextButton();
+        } else {
+            // Update progress to 100%
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressText').textContent = 'Interview Complete!';
+
+            // Show finish button
+            addFinishButton();
+        }
+    } catch (err) {
+        removeThinking(thinkingId);
+        addChatMessage('feedback', 'Error evaluating answer. Please try again.');
+        document.getElementById('answerArea').style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = 'Send Answer →';
+    }
+
+    scrollChat();
+}
+
+// ── Chat Messages ──
+function addChatMessage(type, content, questionType) {
+    const chatArea = document.getElementById('chatArea');
+    const msg = document.createElement('div');
+    msg.className = 'chat-message chat-' + type;
+
+    let avatar, label;
+    if (type === 'interviewer') {
+        avatar = '🤖';
+        label = 'Interviewer';
+    } else if (type === 'user') {
+        avatar = '👤';
+        label = 'You';
+    } else {
+        avatar = '📝';
+        label = 'AI Feedback';
+    }
+
+    let typeTag = '';
+    if (questionType) {
+        typeTag = `<span class="chat-question-type type-${questionType.toLowerCase()}">${questionType}</span>`;
+    }
+
+    msg.innerHTML = `
+        <div class="chat-avatar">${avatar}</div>
+        <div class="chat-bubble">
+            <div class="chat-label">${label} ${typeTag}</div>
+            <div class="chat-content">${formatContent(content)}</div>
+        </div>
+    `;
+
+    chatArea.appendChild(msg);
+    scrollChat();
+}
+
+function formatContent(text) {
+    // Convert markdown-like formatting to HTML
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n- /g, '\n• ')
+        .replace(/\n(\d+)\. /g, '\n$1. ')
+        .replace(/\n/g, '<br>');
+}
+
+function addThinking() {
+    const chatArea = document.getElementById('chatArea');
+    const id = 'thinking-' + Date.now();
+    const msg = document.createElement('div');
+    msg.className = 'chat-message chat-feedback';
+    msg.id = id;
+    msg.innerHTML = `
+        <div class="chat-avatar">📝</div>
+        <div class="chat-bubble">
+            <div class="chat-label">AI Feedback</div>
+            <div class="chat-content thinking-dots">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    `;
+    chatArea.appendChild(msg);
+    scrollChat();
+    return id;
+}
+
+function removeThinking(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+}
+
+function addNextButton() {
+    const chatArea = document.getElementById('chatArea');
+    const div = document.createElement('div');
+    div.className = 'chat-action';
+    div.innerHTML = `<button class="btn btn-primary" onclick="this.parentElement.remove(); showQuestion();">Next Question →</button>`;
+    chatArea.appendChild(div);
+    scrollChat();
+}
+
+function addFinishButton() {
+    const chatArea = document.getElementById('chatArea');
+    const div = document.createElement('div');
+    div.className = 'chat-action';
+    div.innerHTML = `<button class="btn btn-primary" onclick="showSummary()">📊 View Interview Summary</button>`;
+    chatArea.appendChild(div);
+    scrollChat();
+}
+
+function scrollChat() {
+    const chatArea = document.getElementById('chatArea');
+    setTimeout(() => {
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }, 100);
+}
+
+// ── Summary ──
+async function showSummary() {
+    document.getElementById('interviewScreen').style.display = 'none';
+    document.getElementById('summaryScreen').style.display = 'block';
+
+    const summaryContent = document.getElementById('summaryContent');
+    summaryContent.innerHTML = `
+        <div style="text-align:center;padding:40px;">
+            <div class="loading-spinner" style="margin:0 auto 16px;"></div>
+            <p style="color:var(--text-secondary);">Generating your performance summary...</p>
+        </div>
+    `;
+
+    try {
+        const res = await fetch('/api/interview/summary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                role: interviewRole,
+                qa_pairs: answers
+            })
+        });
+
+        const data = await res.json();
+        summaryContent.innerHTML = `<div class="summary-body">${formatContent(data.summary)}</div>`;
+    } catch (err) {
+        summaryContent.innerHTML = `<p style="color:var(--accent-rose);">Failed to generate summary. Please try again.</p>`;
+    }
+}
+
+// ── Reset ──
+function resetInterview() {
+    questions = [];
+    currentQuestion = 0;
+    answers = [];
+    interviewRole = '';
+
+    document.getElementById('chatArea').innerHTML = '';
+    document.getElementById('setupScreen').style.display = 'block';
+    document.getElementById('interviewScreen').style.display = 'none';
+    document.getElementById('summaryScreen').style.display = 'none';
+
+    const btn = document.getElementById('startBtn');
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Start Interview';
+
+    document.getElementById('interviewRole').value = '';
+    document.getElementById('progressFill').style.width = '0%';
+}
+
+// 🎤 Voice Input
+let recognition;
+
+function startVoiceInput() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Voice not supported");
+        return;
+    }
+
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = "en-IN";
+
+    recognition.onstart = () => {
+        document.getElementById("voiceBtn").innerText = "🎙 Listening...";
+    };
+
+    recognition.onresult = (event) => {
+        document.getElementById("answerInput").value =
+            event.results[0][0].transcript;
+    };
+
+    recognition.onend = () => {
+        document.getElementById("voiceBtn").innerText = "🎤 Speak";
+    };
+
+    recognition.start();
+}
+
+// 🎥 Camera
+let stream = null;
+
+async function toggleCamera() {
+    const video = document.getElementById("cameraFeed");
+    const status = document.getElementById("cameraStatus");
+
+    if (!stream) {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            status.innerText = "Camera ON";
+        } catch {
+            status.innerText = "Camera Blocked";
+        }
+    } else {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        video.srcObject = null;
+        status.innerText = "Camera Off";
+    }
+}
+</script>
+{% endblock %}

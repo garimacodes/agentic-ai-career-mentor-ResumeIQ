@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered career mentor with resume builder, skill gap analysis, and personalized career roadmaps.">
+    <title>{% block title %}Agentic AI Career Mentor{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="/" class="nav-logo">
+            <span class="logo-icon">⚡</span>
+            CareerAI
+        </a>
+        <ul class="nav-links">
+            <li><a href="/" class="{% if active_page == 'home' %}active{% endif %}">🏠 Home</a></li>
+            <li><a href="/builder" class="{% if active_page == 'builder' %}active{% endif %}">📝 Resume Builder</a></li>
+            <li><a href="/analyze" class="{% if active_page == 'analyze' %}active{% endif %}">🔍 Analyze</a></li>
+            <li><a href="/interview" class="{% if active_page == 'interview' %}active{% endif %}">🎤 Interview</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        Built with ❤️ using Flask & Groq AI &mdash; Agentic AI Career Mentor &copy; 2026
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Analyzing your profile...</div>
+        <div class="loading-subtext">Our AI agents are working together to create your personalized report</div>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

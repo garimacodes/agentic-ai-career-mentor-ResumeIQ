@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}CareerAI — AI Career Mentor & Resume Intelligence{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-badge">✦ Powered by Multi-Agent AI</div>
+    <h1>
+        Your AI-Powered<br>
+        <span class="gradient-text">Career Mentor</span>
+    </h1>
+    <p>
+        Build stunning resumes, uncover skill gaps, and get a personalized career roadmap — all powered by intelligent AI agents working together.
+    </p>
+    <div class="hero-buttons">
+        <a href="/builder" class="btn btn-primary">📝 Build Your Resume</a>
+        <a href="/analyze" class="btn btn-secondary">🔍 Analyze Career</a>
+        <a href="/interview" class="btn btn-secondary">🎤 Mock Interview</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="feature-card">
+        <div class="feature-icon purple">📝</div>
+        <h3>Smart Resume Builder</h3>
+        <p>Build your resume step-by-step with a live preview. Get AI suggestions for missing keywords and improvements tailored to your target role.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon cyan">🔍</div>
+        <h3>Multi-Agent Analysis</h3>
+        <p>Six specialized AI agents analyze your profile, resume, skills, and career goals to deliver comprehensive, actionable insights.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon emerald">🗺️</div>
+        <h3>Career Roadmap</h3>
+        <p>Get a week-by-week, 3-month learning roadmap customized to bridge your skill gaps and reach your dream role faster.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon rose">🎤</div>
+        <h3>Mock Interview</h3>
+        <p>Practice with an AI interviewer that asks role-specific questions and gives instant feedback on your answers to build confidence.</p>
+    </div>
+</section>
+{% endblock %}

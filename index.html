@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agentic AI Career System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- 🏠 HOME SCREEN -->
+<div id="home" class="screen active">
+    <h1>🚀 Agentic AI Career Mentor</h1>
+    <p>Your personal AI guide for career success</p>
+    <button onclick="showForm()">Get Started</button>
+</div>
+
+<!-- 📝 FORM SCREEN -->
+<div id="formScreen" class="screen">
+    <h2>Enter Your Details</h2>
+
+    <form method="POST" enctype="multipart/form-data" onsubmit="showLoading()">
+        <input name="name" placeholder="Name" required>
+        <input name="degree" placeholder="Degree" required>
+        <input name="skills" placeholder="Skills" required>
+        <input name="goal" placeholder="Career Goal" required>
+        <input type="file" name="resume" required>
+        <button type="submit">Analyze</button>
+    </form>
+</div>
+
+<!-- ⏳ LOADING SCREEN -->
+<div id="loading" class="screen">
+    <h2>Analyzing your profile...</h2>
+    <div class="loader"></div>
+</div>
+
+<!-- 📊 RESULT SCREEN -->
+{% if result %}
+<div id="resultScreen" class="screen active">
+
+    <h2>📊 Your Career Dashboard</h2>
+
+    <div class="tabs">
+        <button onclick="showTab('profile')">Profile</button>
+        <button onclick="showTab('analysis')">Resume</button>
+        <button onclick="showTab('skills')">Skills</button>
+        <button onclick="showTab('roadmap')">Roadmap</button>
+    </div>
+
+    <div id="profile" class="tab active">
+        <pre>{{ result }}</pre>
+    </div>
+
+    <div id="analysis" class="tab">
+        <pre>{{ result }}</pre>
+    </div>
+
+    <div id="skills" class="tab">
+        <pre>{{ result }}</pre>
+    </div>
+
+    <div id="roadmap" class="tab">
+        <pre>{{ result }}</pre>
+    </div>
+
+</div>
+{% endif %}
+
+<script>
+function showForm() {
+    document.getElementById("home").style.display = "none";
+    document.getElementById("formScreen").style.display = "block";
+}
+
+function showLoading() {
+    document.getElementById("formScreen").style.display = "none";
+    document.getElementById("loading").style.display = "block";
+}
+
+function showTab(tabId) {
+    let tabs = document.querySelectorAll(".tab");
+    tabs.forEach(t => t.style.display = "none");
+
+    document.getElementById(tabId).style.display = "block";
+}
+</script>
+
+</body>
+</html>
